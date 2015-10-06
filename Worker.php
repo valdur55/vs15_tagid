@@ -1,6 +1,7 @@
 <pre>
 <?php
 
+require 'Deploy.php';
 define ("NAME", 0);
 
 class Worker {
@@ -8,8 +9,12 @@ class Worker {
     var $spreadsheet_url="";
     var $repo_col = Array(2,5,8);
     var $url_error = Array();
+    var $cfg = Array(
+        "p_root" => "/home/KHK/valdur.kana/public/vs15/koik_tagid/repo",
+    );
     function Worker($csv_link) {
         $this->set_projects($csv_link);
+        $this->deploy();
     }
 
     function set_projects($csv) {
@@ -40,7 +45,11 @@ class Worker {
 
                 //Leia github-i lingid
                 if (stristr($col, 'github.com', false) ){
-                    $this->projects[$name]["git"] = $col;
+                    if ($name != "Kadri") {
+                        $user= explode("/", $col);
+                        $this->projects[$name]["git"] = $col;
+                        $this->projects[$name]["user"] = $user[3];
+                    }
                 } else {
                     //Leia tühi või vigane repo url
                     if (empty($col)) {
@@ -53,8 +62,40 @@ class Worker {
         }
 
         fclose($file);
-        print_r($this->url_error); 
+        //print_r($this->url_error); 
         print_r($this->projects);
+    }
+
+    function deploy(){
+        foreach ($this->projects as &$project) {
+        // Start output buffering (capturing)
+        ob_start();
+
+
+        $project_root = $this->cfg["p_root"];
+        $project_name = $project["user"];
+        $db_host = '';
+        $db_pass = '';
+        $git_url = $project["git"];
+        $admin_email = 'www-data@ikt.khk.ee';
+        $members = array('valdur.kana@khk.ee');
+
+        $config = new stdClass;
+        $config->admin_email = $admin_email;
+        $config->changelog_link = "http://diarainfra.com/$project_name/dev";
+        $config->db_host = $db_host;
+        $config->db_user = "$project_name";
+        $config->db_base = "$project_name";
+        $config->db_pass = $db_pass;
+        $config->git_url = $git_url;
+        $config->project_name = $project_name;
+        $config->config_folder = "$project_root/$project_name";
+        $config->project_folder = "$project_root/$project_name";
+        $config->project_members = $members;
+        $config->emoji = '\xF0\x9F\x9A\x91';
+
+        $deploy = new Deploy($config);
+        }
     }
 }
 
