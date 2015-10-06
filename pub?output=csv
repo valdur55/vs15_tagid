@@ -1,7 +1,7 @@
 ,,,,,,,,,
 ,,1,,,2,,,3,
 ,,Githubi link,Deploy link,,Githubi link,Deploy link,,Githubi link,Deploy link
-"Alvar, Jürgen",,,#VALUE!,,https://github.com/jyrgenhallast/Projekt2-All-Tags.git,http://diarainfra.com/khk/deploy.php?group=vs15&user=jyrgenhallast&project=Projekt2-All-Tags.git,,,#VALUE!
+"Alvar, Jürgen",,,#VALUE!,,https://github.com/jyrgenhallast/Projekt2-All-Tags,http://diarainfra.com/khk/deploy.php?group=vs15&user=jyrgenhallast&project=Projekt2-All-Tags,,,#VALUE!
 "Martin M, Kadri",,https://github.com/mmrtn/all_tags,http://diarainfra.com/khk/deploy.php?group=vs15&user=mmrtn&project=all_tags,,https://github.com/kadrim1/project2,http://diarainfra.com/khk/deploy.php?group=vs15&user=kadrim1&project=project2,,,#VALUE!
 "Janre, Heigo",,,#VALUE!,,,#VALUE!,,,#VALUE!
 "Morten, Rasmus R",,https://github.com/MortenEhari/tagideprojekt,http://diarainfra.com/khk/deploy.php?group=vs15&user=MortenEhari&project=tagideprojekt,,https://github.com/rasmusreimaa/project2,http://diarainfra.com/khk/deploy.php?group=vs15&user=rasmusreimaa&project=project2,,,#VALUE!
@@ -9,7 +9,7 @@
 "Indro, Rasmus P",,https://github.com/theindro/alltagpro,http://diarainfra.com/khk/deploy.php?group=vs15&user=theindro&project=alltagpro,,https://github.com/PindsterY/Projekt2,http://diarainfra.com/khk/deploy.php?group=vs15&user=PindsterY&project=Projekt2,,,#VALUE!
 "Valdur, Andres",,,#VALUE!,,,#VALUE!,,,#VALUE!
 "Martin K, Ott-Erik",,https://github.com/MKooga/VSProjekt2,http://diarainfra.com/khk/deploy.php?group=vs15&user=MKooga&project=VSProjekt2,,https://github.com/otteendra/OttProjekt2,http://diarainfra.com/khk/deploy.php?group=vs15&user=otteendra&project=OttProjekt2,,,#VALUE!
-"Ben, Nicolas",,"http://diarainfra.com/khk/deploy.php?group=vs15&user=""&mid(MID(C13,20,len(C13)),1,find(""/"",MID(C13,20,len(C13)))-1)&""&""&""project=""&mid(MID(C13,20,len(C13)),find(""/"",MID(C13,20,len(C13)))+1,len(C13))",#VALUE!,,https://github.com/reosarevok/VS15-2,http://diarainfra.com/khk/deploy.php?group=vs15&user=reosarevok&project=VS15-2,,,#VALUE!
+"Ben, Nicolas",,,#VALUE!,,https://github.com/reosarevok/VS15-2,http://diarainfra.com/khk/deploy.php?group=vs15&user=reosarevok&project=VS15-2,,,#VALUE!
 "Martin O, Robert R",,,,,,#VALUE!,,,#VALUE!
 "Allar, Lauri",,,#VALUE!,,https://github.com/LauriNomtak/koiktagid,http://diarainfra.com/khk/deploy.php?group=vs15&user=LauriNomtak&project=koiktagid,,,#VALUE!
 "Ivar, Karl M",,https://github.com/phoenix913/Tagid-Ivar,http://diarainfra.com/khk/deploy.php?group=vs15&user=phoenix913&project=Tagid-Ivar,,,#VALUE!,,,#VALUE!
