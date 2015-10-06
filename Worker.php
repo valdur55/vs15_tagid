@@ -1,8 +1,8 @@
 <pre>
 <?php
 
-define ("DEV", true);
 define ("NAME", 0);
+
 class Worker {
     var $projects = array();
     var $spreadsheet_url="";
@@ -57,12 +57,6 @@ class Worker {
         print_r($this->projects);
     }
 }
-
-
-$tee = new Worker("https://docs.google.com/spreadsheets/d/".
-    "1j44KDS8Y_fuRkz7-9jjvjp1FQamFJPIgpGTpZFFN5UQ/".
-    "pub?output=csv");
-
 
 ?>
 
