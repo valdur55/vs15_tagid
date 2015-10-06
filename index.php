@@ -40,7 +40,7 @@ class Worker {
 
                 //Leia github-i lingid
                 if (stristr($col, 'github.com', false) ){
-                    $this->projects[$name] = $col;
+                    $this->projects[$name]["git"] = $col;
                 } else {
                     //Leia tühi või vigane repo url
                     if (empty($col)) {
