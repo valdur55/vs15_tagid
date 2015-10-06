@@ -14,7 +14,7 @@ define('FD_ERR', 2);        # stderr
 class Deploy
 {
     private $project_members;
-
+    public $last_commit;
     function __construct($conf)
     {
         // Convert emoji from \x escape sequence to quoted printable, adding a non-breaking space at the end
@@ -205,8 +205,9 @@ class Deploy
         ob_start();
 
         // Get last commit data
-        $this->execute("Project: $project_name", "cd $pf && git log -1 2>&1");
-
+        $log_command = "cd $pf && git log -1 2>&1";
+        //$this->execute("Project: $project_name", $log_command);
+        $this->last_commit=shell_exec($log_command);
         // Get commit metadata from POST body
         $payload = $this->get_payload();
 

@@ -15,6 +15,7 @@ class Worker {
     function Worker($csv_link) {
         $this->set_projects($csv_link);
         $this->deploy();
+        print_r($this->projects);
     }
 
     function set_projects($csv) {
@@ -49,6 +50,7 @@ class Worker {
                         $user= explode("/", $col);
                         $this->projects[$name]["git"] = $col;
                         $this->projects[$name]["user"] = $user[3];
+                        $this->projects[$name]["p_dir"] = $this->cfg["p_root"]."/".$user[3];
                     }
                 } else {
                     //Leia tühi või vigane repo url
@@ -63,15 +65,14 @@ class Worker {
 
         fclose($file);
         //print_r($this->url_error); 
-        print_r($this->projects);
     }
 
     function deploy(){
         foreach ($this->projects as &$project) {
         // Start output buffering (capturing)
-        ob_start();
+        //ob_start();
 
-
+        //print_r($project);
         $project_root = $this->cfg["p_root"];
         $project_name = $project["user"];
         $db_host = '';
@@ -82,7 +83,7 @@ class Worker {
 
         $config = new stdClass;
         $config->admin_email = $admin_email;
-        $config->changelog_link = "http://diarainfra.com/$project_name/dev";
+        $config->changelog_link = "http://ikt.khk.ee/~valdur.kana/vs15/koik_tagid/repo/$project_name";
         $config->db_host = $db_host;
         $config->db_user = "$project_name";
         $config->db_base = "$project_name";
@@ -95,8 +96,14 @@ class Worker {
         $config->emoji = '\xF0\x9F\x9A\x91';
 
         $deploy = new Deploy($config);
+        //print_r($deploy->last_commit);
+        //$project["last_commit"]=$deploy->last_commit;
         }
     }
+
+
+
+
 }
 
 ?>
