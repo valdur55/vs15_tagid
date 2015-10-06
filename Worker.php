@@ -10,11 +10,12 @@ class Worker {
     var $repo_col = Array(2,5,8);
     var $url_error = Array();
     var $cfg = Array(
-        "p_root" => "/home/KHK/valdur.kana/public/vs15/koik_tagid/repo",
+        "p_root" => "repo",
     );
     function Worker($csv_link) {
         $this->set_projects($csv_link);
         $this->deploy();
+        $this->simple_analyze();
         print_r($this->projects);
     }
 
@@ -48,9 +49,11 @@ class Worker {
                 if (stristr($col, 'github.com', false) ){
                     if ($name != "Kadri") {
                         $user= explode("/", $col);
-                        $this->projects[$name]["git"] = $col;
-                        $this->projects[$name]["user"] = $user[3];
-                        $this->projects[$name]["p_dir"] = $this->cfg["p_root"]."/".$user[3];
+                        $base = $user[3];
+                        $this->projects[$base]["name"]=$name;
+                        $this->projects[$base]["git"] = $col;
+                        $this->projects[$base]["user"] = $user[3];
+                        $this->projects[$base]["p_dir"] = $this->cfg["p_root"]."/".$user[3];
                     }
                 } else {
                     //Leia tühi või vigane repo url
@@ -64,11 +67,13 @@ class Worker {
         }
 
         fclose($file);
-        //print_r($this->url_error); 
+        //print_r($this->projects);
+        print_r($this->url_error);
+
     }
 
     function deploy(){
-        foreach ($this->projects as &$project) {
+        foreach ($this->projects as $project) {
         // Start output buffering (capturing)
         //ob_start();
 
@@ -97,12 +102,33 @@ class Worker {
 
         $deploy = new Deploy($config);
         //print_r($deploy->last_commit);
-        //$project["last_commit"]=$deploy->last_commit;
+        $this->projects[$project["user"]]["last_commit"]=$deploy->last_commit;
         }
     }
 
+    private function get_counts($type){
+        $files = ($type == "html") ? "repo/*/*.php repo/*/*.html" : "repo/*/*.css repo/*/*/*.css repo/*/*/*/*.css";
+        $raw = explode("\n ", shell_exec("wc -l ". $files . " | head -n-1"));
+        print_r($raw);
+        foreach($raw as $line) {
+            $line=explode(" ", trim($line));
+            $i = $line[0];
+            $file = $line[1];
+            $user = explode("/",$file);
+            $this->projects[$user[1]]["files"][$type][]=$file;
+            $this->projects[$user[1]]["counts"][$type]+=$i;
+        }
+    }
+    function simple_analyze() {
+        $index_counts = $this->get_counts("html");
+        $css_counts =  $this->get_counts("css");
 
 
+    }
+
+    function css_analyze(){
+        $files = shell_exec("awk -F ':' '/:/ {printf $1}' $css_file");
+    }
 
 }
 

@@ -29,7 +29,7 @@ class Deploy
         if (file_exists($conf->project_folder)) {
             $this->checkout_project($conf->project_folder);
         } else {
-            $this->clone_project($conf->project_folder);
+            $this->clone_project($conf->git_url ,$conf->project_folder);
         }
         //$this->recreate_uploads($conf->project_name, $conf->project_folder);
         //$this->modify_config_php($conf->config_folder, $conf->db_host, $conf->db_user, $conf->db_pass, $conf->db_base);
@@ -52,7 +52,7 @@ class Deploy
     {
 
         $cmd = empty($cmd) ? $msg : $cmd;
-        echo "\n$msg...\n $cmd\n";
+        echo (VERBOSE) ? "\n$msg...\n $cmd\n": "";
         $exit_code = $this->proc_exec($cmd);
 
         if ($exit_code > 0) {
