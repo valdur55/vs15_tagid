@@ -11,13 +11,18 @@ class Worker {
     var $cfg = Array(
         "p_root" => "repo",
     );
+    var $tags = array();
+    var $types = array("html", "css");
+
     function Worker($csv_link) {
         $this->set_projects($csv_link);
         $this->deploy();
-        $this->simple_analyze();
-        var_dump($this->projects);
+        $this->analyze();
     }
 
+    function get_projects() {
+        return $this->projects;
+    }
     function set_projects($csv) {
         $csv_link= (DEV) ? "pub?output=csv": $csv;
         $file = fopen($csv_link, "r") or false;
@@ -46,15 +51,13 @@ class Worker {
 
                 //Leia github-i lingid
                 if (stristr($col, 'github.com', false) ){
-                    if ($name != "Kadri") {
-                        $user= explode("/", $col);
-                        $base = $user[3];
-                        $this->projects[$base]["name"]=$name;
-                        $this->projects[$base]["git"] = $col;
-                        $this->projects[$base]["user"] = $user[3];
-                        $this->projects[$base]["p_dir"] =
-                            $this->cfg["p_root"]."/".$user[3];
-                    }
+                    $user= explode("/", $col);
+                    $base = $user[3];
+                    $this->projects[$base]["name"]=$name;
+                    $this->projects[$base]["git"] = $col;
+                    $this->projects[$base]["user"] = $user[3];
+                    $this->projects[$base]["p_dir"] =
+                    $this->cfg["p_root"]."/".$user[3];
                 } else {
                     //Leia tühi või vigane repo url
                     if (empty($col)) {
@@ -107,24 +110,35 @@ class Worker {
         }
     }
 
-    private function get_files($type){
+    private function get_file_list($type){
         $files = ($type == "html")
             ? "repo/*/*.php repo/*/*.html"
             : "repo/*/*.css repo/*/*/*.css repo/*/*/*/*.css";
         $raw = explode("\n ", shell_exec("wc -l ". $files . " | head -n-1"));
-        var_dump($raw);
         foreach($raw as $line) {
             $line=explode(" ", trim($line));
             $i = $line[0];
-            $file = $line[1];
-            $user = explode("/",$file);
+             $file = $line[1];
+             $user = explode("/",$file);
             $this->projects[$user[1]]["files"][$type][]=$file;
-        }
+         }
     }
-    function simple_analyze() {
-        $this->get_files("html");
-        $this->get_files("css");
 
+    private function get_tags($type) {
+        $filename = $type."_tags";
+        $f = fopen($filename, "r") or die("Can't open ".$filename);
+        $line = fgets($f);
+        $separator = ($type == "html") ? "><" : "" ;
+        $tags=explode($separator, $line);
+        $this->tags[$type]=$tags;
+    }
+
+    function analyze() {
+        foreach ($this->types as $type) {
+            $this->get_file_list($type);
+            $this->get_tags($type);
+            $this->analyze_tags($type);
+        }
 
 
     }
@@ -135,6 +149,17 @@ class Worker {
         }
     }
 
+    function analyze_tags($type){
+        foreach($this->projects as $project) {
+            foreach ($project["files"][$type] as $file){
+                foreach($this->tags[$type] as $tag){
+                    $i = shell_exec('grep -c '.$tag.' '.$file);
+                    $r =  ($i == 0) ? "unused" : "used";
+                    $this->projects[$project["user"]]["tags"][$r][]=$tag;
+                }
+            }
+        }
+    }
 }
 
 ?>
