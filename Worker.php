@@ -1,4 +1,3 @@
-<pre>
 <?php
 
 require 'Deploy.php';
@@ -16,7 +15,7 @@ class Worker {
         $this->set_projects($csv_link);
         $this->deploy();
         $this->simple_analyze();
-        print_r($this->projects);
+        var_dump($this->projects);
     }
 
     function set_projects($csv) {
@@ -53,7 +52,8 @@ class Worker {
                         $this->projects[$base]["name"]=$name;
                         $this->projects[$base]["git"] = $col;
                         $this->projects[$base]["user"] = $user[3];
-                        $this->projects[$base]["p_dir"] = $this->cfg["p_root"]."/".$user[3];
+                        $this->projects[$base]["p_dir"] =
+                            $this->cfg["p_root"]."/".$user[3];
                     }
                 } else {
                     //Leia tühi või vigane repo url
@@ -67,8 +67,8 @@ class Worker {
         }
 
         fclose($file);
-        //print_r($this->projects);
-        print_r($this->url_error);
+        //var_dump($this->projects);
+        var_dump($this->url_error);
 
     }
 
@@ -77,7 +77,7 @@ class Worker {
         // Start output buffering (capturing)
         //ob_start();
 
-        //print_r($project);
+        //var_dump($project);
         $project_root = $this->cfg["p_root"];
         $project_name = $project["user"];
         $db_host = '';
@@ -88,7 +88,8 @@ class Worker {
 
         $config = new stdClass;
         $config->admin_email = $admin_email;
-        $config->changelog_link = "http://ikt.khk.ee/~valdur.kana/vs15/koik_tagid/repo/$project_name";
+        $config->changelog_link = 
+            "http://ikt.khk.ee/~valdur.kana/vs15/koik_tagid/repo/$project_name";
         $config->db_host = $db_host;
         $config->db_user = "$project_name";
         $config->db_base = "$project_name";
@@ -101,33 +102,37 @@ class Worker {
         $config->emoji = '\xF0\x9F\x9A\x91';
 
         $deploy = new Deploy($config);
-        //print_r($deploy->last_commit);
-        $this->projects[$project["user"]]["last_commit"]=$deploy->last_commit;
+        //var_dump($deploy->last_commit);
+        //$this->projects[$project["user"]]["last_commit"]=$deploy->last_commit;
         }
     }
 
-    private function get_counts($type){
-        $files = ($type == "html") ? "repo/*/*.php repo/*/*.html" : "repo/*/*.css repo/*/*/*.css repo/*/*/*/*.css";
+    private function get_files($type){
+        $files = ($type == "html")
+            ? "repo/*/*.php repo/*/*.html" 
+            : "repo/*/*.css repo/*/*/*.css repo/*/*/*/*.css";
         $raw = explode("\n ", shell_exec("wc -l ". $files . " | head -n-1"));
-        print_r($raw);
+        var_dump($raw);
         foreach($raw as $line) {
             $line=explode(" ", trim($line));
             $i = $line[0];
             $file = $line[1];
             $user = explode("/",$file);
             $this->projects[$user[1]]["files"][$type][]=$file;
-            $this->projects[$user[1]]["counts"][$type]+=$i;
         }
     }
     function simple_analyze() {
-        $index_counts = $this->get_counts("html");
-        $css_counts =  $this->get_counts("css");
+        $this->get_files("html");
+        $this->get_files("css");
+
 
 
     }
 
     function css_analyze(){
-        $files = shell_exec("awk -F ':' '/:/ {printf $1}' $css_file");
+        foreach ($projects as $project) {
+            $files = shell_exec("awk -F ':' '/:/ {printf $1}' $css_file");
+        }
     }
 
 }
