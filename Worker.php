@@ -128,7 +128,7 @@ class Worker {
         $filename = $type."_tags";
         $f = fopen($filename, "r") or die("Can't open ".$filename);
         $line = fgets($f);
-        $separator = ($type == "html") ? "><" : "" ;
+        $separator = ($type == "html") ? "><" : "," ;
         $tags=explode($separator, $line);
         $this->tags[$type]=$tags;
     }
@@ -150,12 +150,24 @@ class Worker {
     }
 
     function analyze_tags($type){
-        foreach($this->projects as $project) {
+        foreach($this->projects as $project){
+            if (empty($project["files"])){
+                continue;
+            }
+            if (empty($project["files"]["css"])){
+                continue;
+            }
+
             foreach ($project["files"][$type] as $file){
+            if (empty($project["files"]) && empty($project["files"]["css"])){
+                continue;
+            }
                 foreach($this->tags[$type] as $tag){
                     $i = shell_exec('grep -c '.$tag.' '.$file);
                     $r =  ($i == 0) ? "unused" : "used";
-                    $this->projects[$project["user"]]["tags"][$r][]=$tag;
+                    if (!empty($project["user"])) {
+                        $this->projects[$project["user"]]["tags"][$r][]=$tag;
+                    }
                 }
             }
         }
