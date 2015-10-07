@@ -21,6 +21,13 @@ $projects = $worker->get_projects();
 </head>
 <body>
     <table border="1" >
+        <thead>
+            <th>Nimi</th>
+            <th>Kasutatud tagid (arv)</th>
+            <th>Kasutamata tagid (arv)</th>
+            <th>Kasutamat tagid</th>
+        </thead>
+
         <?php foreach ($projects as $p): ?>
         <tr>
 
