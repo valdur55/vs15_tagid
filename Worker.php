@@ -88,7 +88,7 @@ class Worker {
 
         $config = new stdClass;
         $config->admin_email = $admin_email;
-        $config->changelog_link = 
+        $config->changelog_link =
             "http://ikt.khk.ee/~valdur.kana/vs15/koik_tagid/repo/$project_name";
         $config->db_host = $db_host;
         $config->db_user = "$project_name";
@@ -109,7 +109,7 @@ class Worker {
 
     private function get_files($type){
         $files = ($type == "html")
-            ? "repo/*/*.php repo/*/*.html" 
+            ? "repo/*/*.php repo/*/*.html"
             : "repo/*/*.css repo/*/*/*.css repo/*/*/*/*.css";
         $raw = explode("\n ", shell_exec("wc -l ". $files . " | head -n-1"));
         var_dump($raw);
