@@ -12,11 +12,12 @@ class Worker {
     );
     var $tags = array();
     var $types = array("html", "css");
-
+    var $stat = array();
     function Worker($csv_link) {
         $this->set_projects($csv_link);
         $this->deploy();
         $this->analyze();
+        //$this->statistic();
     }
 
     function get_projects() {
@@ -134,7 +135,7 @@ class Worker {
         foreach ($this->types as $type) {
             $this->get_tags($type);
         }
-        $this->analyze_tags($type);
+        $this->analyze_tags();
 
     }
 
@@ -147,15 +148,28 @@ class Worker {
                 //    $this->tags;
                 continue;
             }
-            $files="'".implode("' '", $project["files"])."'";
+            //$files="'".implode("' '", $project["files"])."'";
             foreach($this->tags as $tag){
-                if (!empty($project["user"])) {
-                    $i = shell_exec("grep -h -c -m 1 '$tag' $files");
-                    $r =  ($i == 0) ? "unused" : "used";
-                    $this->projects[$project["user"]]["tags"][$r][]=$tag;
+                $r="unused";
+                foreach ($project["files"] as $file) {
+                    if (shell_exec("grep -h -c -m 1 '$tag' '$file'") != 0){
+                        $r="used";
+                        break;
+                    }
                 }
+                $this->projects[$project["user"]]["tags"][$r][]=$tag;
             }
         }
+    }
+
+    function statistic(){
+        foreach($this->projects as $p){
+            foreach($p[tags]["used"] as $tag){
+                $tc=$this->stat[$tag];
+                $this->stat[$tag]= (empty($tc)) ? 0 : $tc+1;
+            }
+        }
+        var_dump($this->stat);
     }
 }
 

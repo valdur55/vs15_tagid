@@ -57,12 +57,5 @@ $errors = array();
     <? foreach($errors["notags"] as $p) : ?>
         <li><?= $p["name"] ?></li>
     <? endforeach ?>
-    </ul>
-    <h2>Pole nime</h2>
-    <ul>
-    <? foreach($errors["noname"] as $p) : ?>
-        <li><?= var_dump($p) ?></li>
-    <? endforeach ?>
-    </ul>
 </body>
 </html>
