@@ -109,17 +109,14 @@ class Worker {
         }
     }
 
-    private function get_file_list($type){
-        $files = ($type == "html")
-            ? "repo/*/*.php repo/*/*.html"
-            : "repo/*/*.css repo/*/*/*.css repo/*/*/*/*.css";
-        $raw = explode("\n", shell_exec("ls -1 ". $files ));
+    private function get_file_list(){
+        $raw = explode("\n", shell_exec('find repo -name "*.css" -o -name "*.html" -o -name "*.php"' ));
         foreach($raw as $file) {
             if (empty($file)) {
                 continue;
             }
             $user = explode("/",$file);
-            $this->projects[$user[1]]["files"][$type][]=$file;
+            $this->projects[$user[1]]["files"][]=$file;
          }
     }
 
@@ -129,40 +126,34 @@ class Worker {
         $line = fgets($f);
         $separator = ($type == "html") ? "><" : "," ;
         $tags=explode($separator, $line);
-        $this->tags[$type]=$tags;
+        $this->tags= array_merge($this->tags, $tags);
     }
 
     function analyze() {
+        $this->get_file_list();
         foreach ($this->types as $type) {
-            $this->get_file_list($type);
             $this->get_tags($type);
-            $this->analyze_tags($type);
         }
-
+        $this->analyze_tags($type);
 
     }
 
 
-    function analyze_tags($type){
+    function analyze_tags(){
         foreach($this->projects as $project){
             if (empty($project["files"])){
-                continue;
-            }
-            if (empty($project["files"][$type])){
-                $old_unused=$this->projects[$project["user"]]["tags"]["unused"];
-                $project["name"]="oook";
-                continue;
-            }
 
-            foreach ($project["files"][$type] as $file){
-                foreach($this->tags[$type] as $tag){
-                    $i = shell_exec("grep -c -m 1 '$tag' '$file'");
+                //$this->projects[$project["user"]]["tags"]["unused"]=
+                //    $this->tags;
+                continue;
+            }
+            $files="'".implode("' '", $project["files"])."'";
+            foreach($this->tags as $tag){
+                if (!empty($project["user"])) {
+                    $i = shell_exec("grep -h -c -m 1 '$tag' $files");
                     $r =  ($i == 0) ? "unused" : "used";
-                    if (!empty($project["user"])) {
-                        $this->projects[$project["user"]]["tags"][$r][]=$tag;
-                    }
+                    $this->projects[$project["user"]]["tags"][$r][]=$tag;
                 }
-
             }
         }
     }
