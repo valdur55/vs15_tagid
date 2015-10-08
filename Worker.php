@@ -149,6 +149,8 @@ class Worker {
                 continue;
             }
             if (empty($project["files"][$type])){
+                $old_unused=$this->projects[$project["user"]]["tags"]["unused"];
+                $project["name"]="oook";
                 continue;
             }
 

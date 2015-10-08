@@ -1,17 +1,19 @@
 <?php
 
 define ("DEV", true);
-define ("VERBOSE", false);
-require 'Worker.php';
-require 'Deploy.php';
-
+define ("VERBOSE", true);
+define ("UPDATE_GIT", false);
 $drive_url= "https://docs.google.com/spreadsheets/d/".
         "1j44KDS8Y_fuRkz7-9jjvjp1FQamFJPIgpGTpZFFN5UQ/".
         "pub?output=csv";
+//print_r("wget '$drive_url'");
+
+require 'Worker.php';
+require 'Deploy.php';
+
 $worker = new Worker($drive_url);
 $projects = $worker->get_projects();
 $errors = array();
-//shell_exec("wget $drive_url");
 ?>
 
 
