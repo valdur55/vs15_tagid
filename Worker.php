@@ -1,6 +1,5 @@
 <?php
 
-require 'Deploy.php';
 define ("NAME", 0);
 
 class Worker {
@@ -143,11 +142,6 @@ class Worker {
 
     }
 
-    function css_analyze(){
-        foreach ($projects as $project) {
-            $files = shell_exec("awk -F ':' '/:/ {printf $1}' $css_file");
-        }
-    }
 
     function analyze_tags($type){
         foreach($this->projects as $project){
@@ -159,9 +153,6 @@ class Worker {
             }
 
             foreach ($project["files"][$type] as $file){
-            if (empty($project["files"]) && empty($project["files"]["css"])){
-                continue;
-            }
                 foreach($this->tags[$type] as $tag){
                     $i = shell_exec('grep -c '.$tag.' '.$file);
                     $r =  ($i == 0) ? "unused" : "used";
@@ -169,6 +160,7 @@ class Worker {
                         $this->projects[$project["user"]]["tags"][$r][]=$tag;
                     }
                 }
+
             }
         }
     }
