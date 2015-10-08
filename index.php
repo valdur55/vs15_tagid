@@ -3,6 +3,7 @@
 define ("DEV", true);
 define ("VERBOSE", true);
 define ("UPDATE_GIT", false);
+define ("MIN_COUNT", 9);
 $drive_url= "https://docs.google.com/spreadsheets/d/".
         "1j44KDS8Y_fuRkz7-9jjvjp1FQamFJPIgpGTpZFFN5UQ/".
         "pub?output=csv";

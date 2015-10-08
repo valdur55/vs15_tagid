@@ -1,3 +1,4 @@
+
 <?php
 
 define ("NAME", 0);
@@ -13,11 +14,14 @@ class Worker {
     var $tags = array();
     var $types = array("html", "css");
     var $stat = array();
+    var $popular_tags = array();
     function Worker($csv_link) {
         $this->set_projects($csv_link);
         $this->deploy();
         $this->analyze();
-        //$this->statistic();
+        $this->get_tags_usage(MIN_COUNT);
+        //var_dump($this->projects);
+        $this->clean_unused_tags();
     }
 
     function get_projects() {
@@ -124,7 +128,7 @@ class Worker {
     private function get_tags($type) {
         $filename = $type."_tags";
         $f = fopen($filename, "r") or die("Can't open ".$filename);
-        $line = fgets($f);
+        $line = trim(fgets($f));
         $separator = ($type == "html") ? "><" : "," ;
         $tags=explode($separator, $line);
         $this->tags= array_merge($this->tags, $tags);
@@ -143,9 +147,9 @@ class Worker {
     function analyze_tags(){
         foreach($this->projects as $project){
             if (empty($project["files"])){
-
-                //$this->projects[$project["user"]]["tags"]["unused"]=
-                //    $this->tags;
+                $this->projects[$project["user"]]["tags"]=array(
+                    "unused" => $this->tags,
+                    "used" => array());
                 continue;
             }
             //$files="'".implode("' '", $project["files"])."'";
@@ -162,14 +166,46 @@ class Worker {
         }
     }
 
-    function statistic(){
+    function get_tags_usage($min_usage){
+        $rstat = array();
+        $stat = array();
         foreach($this->projects as $p){
-            foreach($p[tags]["used"] as $tag){
-                $tc=$this->stat[$tag];
-                $this->stat[$tag]= (empty($tc)) ? 0 : $tc+1;
+            if (empty($p["tags"])) {
+                continue;
+            }
+            foreach($p["tags"]["used"] as $tag){
+                if (empty($rstat[$tag])) {
+                    $rstat[$tag] = 1;
+                } else {
+                    $rstat[$tag]+= 1;
+                }
             }
         }
-        var_dump($this->stat);
+        foreach($rstat as $k => $v) {
+            $stat[$v][]=$k;
+            if ($v >= $min_usage) {
+                $this->popular_tags[]=$k;
+            }
+        }
+        ksort($stat);
+        //var_dump($stat);
+    }
+
+    function clean_unused_tags(){
+        foreach($this->projects as $p ){
+            $new_unused=array();
+            foreach($this->popular_tags as $tag){
+                if(empty($p["tags"])) {
+                    var_dump($p);
+                    break;
+                }
+                if(in_array($tag, $p["tags"]["unused"])){
+                    $new_unused[]=$tag;
+                }
+            }
+            $this->projects[$p["user"]]["tags"]["unused"]=$new_unused;
+
+        }
     }
 }
 
