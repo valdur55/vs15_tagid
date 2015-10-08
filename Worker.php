@@ -113,12 +113,12 @@ class Worker {
         $files = ($type == "html")
             ? "repo/*/*.php repo/*/*.html"
             : "repo/*/*.css repo/*/*/*.css repo/*/*/*/*.css";
-        $raw = explode("\n ", shell_exec("wc -l ". $files . " | head -n-1"));
-        foreach($raw as $line) {
-            $line=explode(" ", trim($line));
-            $i = $line[0];
-             $file = $line[1];
-             $user = explode("/",$file);
+        $raw = explode("\n", shell_exec("ls -1 ". $files ));
+        foreach($raw as $file) {
+            if (empty($file)) {
+                continue;
+            }
+            $user = explode("/",$file);
             $this->projects[$user[1]]["files"][$type][]=$file;
          }
     }
@@ -154,7 +154,7 @@ class Worker {
 
             foreach ($project["files"][$type] as $file){
                 foreach($this->tags[$type] as $tag){
-                    $i = shell_exec('grep -c '.$tag.' '.$file);
+                    $i = shell_exec('grep -c "'.$tag.'" "'.$file. '"');
                     $r =  ($i == 0) ? "unused" : "used";
                     if (!empty($project["user"])) {
                         $this->projects[$project["user"]]["tags"][$r][]=$tag;
