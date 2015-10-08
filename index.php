@@ -26,7 +26,7 @@ $errors = array();
 </head>
 <body>
     <div>
-        Valitud on tag-id, mida kasutati vähemalt <?= MIN_COUNT ?>
+        Valitud on tag-id, mida kasutati vähemalt <?= MIN_COUNT ?> õpilast.
     </div>
     <table border="1" >
         <thead>

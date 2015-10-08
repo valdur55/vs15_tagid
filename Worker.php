@@ -74,8 +74,10 @@ class Worker {
         }
 
         fclose($file);
+        echo "<pre>";
         //var_dump($this->projects);
-        var_dump($this->url_error);
+            print_r($this->url_error);
+        echo "</pre>";
 
     }
 
