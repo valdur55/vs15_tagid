@@ -154,7 +154,7 @@ class Worker {
 
             foreach ($project["files"][$type] as $file){
                 foreach($this->tags[$type] as $tag){
-                    $i = shell_exec('grep -c "'.$tag.'" "'.$file. '"');
+                    $i = shell_exec("grep -c '$tag' '$file'");
                     $r =  ($i == 0) ? "unused" : "used";
                     if (!empty($project["user"])) {
                         $this->projects[$project["user"]]["tags"][$r][]=$tag;
