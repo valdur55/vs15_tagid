@@ -25,6 +25,9 @@ $errors = array();
     <title></title>
 </head>
 <body>
+    <div>
+        Valitud on tag-id, mida kasutati vähemalt <?= MIN_COUNT ?>
+    </div>
     <table border="1" >
         <thead>
             <th>Nimi</th>
