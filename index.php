@@ -53,10 +53,5 @@ $errors = array();
 
         <? endforeach ?>
     </table>
-    <h2>Pole css/html/php faile</h2>
-    <ul>
-    <? foreach($errors["notags"] as $p) : ?>
-        <li><?= $p["name"] ?></li>
-    <? endforeach ?>
 </body>
 </html>

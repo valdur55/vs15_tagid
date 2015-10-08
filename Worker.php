@@ -170,9 +170,6 @@ class Worker {
         $rstat = array();
         $stat = array();
         foreach($this->projects as $p){
-            if (empty($p["tags"])) {
-                continue;
-            }
             foreach($p["tags"]["used"] as $tag){
                 if (empty($rstat[$tag])) {
                     $rstat[$tag] = 1;
