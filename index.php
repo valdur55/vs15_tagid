@@ -42,7 +42,7 @@ $errors = array();
                         continue;
                     }
                 ?>
-                <td><?= $p["name"] ?></td>
+                <td><a href="<?= $p["p_dir"] ?>"><?= $p["name"] ?></a></td>
                 <td><?= !empty($p['tags']["used"]) ? count($p["tags"]["used"]) : 0  ?></td>
                 <td><?= count($p['tags']["unused"]) ?></td>
                 <td><?= htmlspecialchars(implode("," ,  $p['tags']["unused"])) ?></td>
@@ -50,6 +50,17 @@ $errors = array();
 
         <? endforeach ?>
     </table>
-    <?= var_dump($errors) ?>
+    <h2>Pole css/html/php faile</h2>
+    <ul>
+    <? foreach($errors["notags"] as $p) : ?>
+        <li><?= $p["name"] ?></li>
+    <? endforeach ?>
+    </ul>
+    <h2>Pole nime</h2>
+    <ul>
+    <? foreach($errors["noname"] as $p) : ?>
+        <li><?= var_dump($p) ?></li>
+    <? endforeach ?>
+    </ul>
 </body>
 </html>

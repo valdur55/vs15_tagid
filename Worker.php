@@ -148,7 +148,7 @@ class Worker {
             if (empty($project["files"])){
                 continue;
             }
-            if (empty($project["files"]["css"])){
+            if (empty($project["files"][$type])){
                 continue;
             }
 
