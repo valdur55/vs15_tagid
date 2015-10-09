@@ -1,6 +1,6 @@
 <?php
 // True korral kasutab kohalikku csv faili, ning jätab repo uuendamata.
-$b=true
+$b=true;
 define ("DEV", $b);
 define ("VERBOSE", $b);
 $min= (empty($_POST["min"])) ? 10 : $_POST["min"];
