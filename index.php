@@ -1,9 +1,10 @@
 <?php
 // True korral kasutab kohalikku csv faili, ning jätab repo uuendamata.
-$b=false;
+$b=true;
 define ("DEV", $b);
 define ("VERBOSE", $b);
-define ("MIN_COUNT", 9);
+$min= (empty($_POST["min"])) ? 10 : $_POST["min"];
+define ("MIN_COUNT", $min);
 $drive_url= "https://docs.google.com/spreadsheets/d/".
         "1j44KDS8Y_fuRkz7-9jjvjp1FQamFJPIgpGTpZFFN5UQ/".
         "pub?output=csv";
@@ -24,6 +25,11 @@ $errors = array();
     <title></title>
 </head>
 <body>
+    <form type="POST" ction="?">
+        <label for="min">Minimaalne õpilaste arv:</label>
+        <input value="<?= $min ?>" type="number" name="min" min=1 max="<?= count($projects) ?>">
+        <button>Saada</button>
+    </form>
     <div>
         Kasutamata tag'ide hulgas kuvatakse tag'e, mida kasutab vähemalt <?= MIN_COUNT ?> õpilast.
     </div>
