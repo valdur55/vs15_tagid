@@ -1,13 +1,12 @@
 <?php
 // True korral kasutab kohalikku csv faili, ning jätab repo uuendamata.
-$b=true;
+$b=false;
 define ("DEV", $b);
 define ("VERBOSE", $b);
 define ("MIN_COUNT", 9);
 $drive_url= "https://docs.google.com/spreadsheets/d/".
         "1j44KDS8Y_fuRkz7-9jjvjp1FQamFJPIgpGTpZFFN5UQ/".
         "pub?output=csv";
-//print_r("wget '$drive_url'");
 
 require 'Worker.php';
 require 'Deploy.php';
