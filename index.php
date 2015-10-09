@@ -1,8 +1,8 @@
 <?php
-
-define ("DEV", true);
-define ("VERBOSE", true);
-define ("UPDATE_GIT", false);
+// True korral kasutab kohalikku csv faili, ning jätab repo uuendamata.
+$b=true;
+define ("DEV", $b);
+define ("VERBOSE", $b);
 define ("MIN_COUNT", 9);
 $drive_url= "https://docs.google.com/spreadsheets/d/".
         "1j44KDS8Y_fuRkz7-9jjvjp1FQamFJPIgpGTpZFFN5UQ/".
@@ -26,7 +26,7 @@ $errors = array();
 </head>
 <body>
     <div>
-        Valitud on tag-id, mida kasutati vähemalt <?= MIN_COUNT ?> õpilast.
+        Kasutamata tag'ide hulgas kuvatakse tag'e, mida kasutab vähemalt <?= MIN_COUNT ?> õpilast.
     </div>
     <table border="1" >
         <thead>

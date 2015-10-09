@@ -17,7 +17,9 @@ class Worker {
     var $popular_tags = array();
     function Worker($csv_link) {
         $this->set_projects($csv_link);
-        $this->deploy();
+        if (!DEV) {
+            $this->deploy();
+        }
         $this->analyze();
         $this->get_tags_usage(MIN_COUNT);
         //var_dump($this->projects);

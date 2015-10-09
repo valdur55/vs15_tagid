@@ -25,13 +25,11 @@ class Deploy
 
         //$this->remove_previous_uploads_folder_backup($conf->project_name);
         //$this->backup_uploads_folder($conf->project_folder, $conf->project_name);
-        //$this->delete_old_project_folder($conf->project_folder); //TODO:USE it
-        if (UPDATE_GIT) {
-            if (file_exists($conf->project_folder)) {
-                $this->checkout_project($conf->project_folder);
-            } else {
-                $this->clone_project($conf->git_url ,$conf->project_folder);
-            }
+        //$this->delete_old_project_folder($conf->project_folder);
+        if (file_exists($conf->project_folder)) {
+            $this->checkout_project($conf->project_folder);
+        } else {
+            $this->clone_project($conf->git_url ,$conf->project_folder);
         }
         //$this->recreate_uploads($conf->project_name, $conf->project_folder);
         //$this->modify_config_php($conf->config_folder, $conf->db_host, $conf->db_user, $conf->db_pass, $conf->db_base);
