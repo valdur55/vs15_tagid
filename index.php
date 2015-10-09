@@ -1,6 +1,6 @@
 <?php
 // True korral kasutab kohalikku csv faili, ning jätab repo uuendamata.
-$b=false;
+$b=true
 define ("DEV", $b);
 define ("VERBOSE", $b);
 $min= (empty($_POST["min"])) ? 10 : $_POST["min"];
@@ -25,7 +25,7 @@ $errors = array();
     <title></title>
 </head>
 <body>
-    <form method=post" action="?">
+    <form method="post" action="?">
         <label for="min">Minimaalne õpilaste arv:</label>
         <input value="<?= $min ?>" type="number" name="min" min=1 max="<?= count($projects) ?>">
         <button>Saada</button>
