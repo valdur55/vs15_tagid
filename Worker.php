@@ -16,14 +16,26 @@ class Worker {
     var $stat = array();
     var $popular_tags = array();
     function Worker($csv_link) {
+        $this->get_tags_from_cache("cache/projects");
         $this->set_projects($csv_link);
-        if (!DEV) {
-            $this->deploy();
+        foreach ($this->types as $type) {
+            $this->get_tags($type);
         }
-        $this->analyze();
+        //$this->deploy();
         $this->get_tags_usage(MIN_COUNT);
         //var_dump($this->projects);
         $this->clean_unused_tags();
+    }
+    function get_tags_from_cache($file) {
+        if (file_exists($file)) {
+            $f = fopen($file, "r");
+            $this->projects = unserialize(fgets($f));
+        }
+    }
+
+    function save_projects($file){
+        $f = fopen($file, "w");
+        fwrite($f, serialize($this->projects));
     }
 
     function get_projects() {
@@ -83,43 +95,59 @@ class Worker {
 
     }
 
+
     function deploy(){
+        $changes = false;
         foreach ($this->projects as $project) {
-        // Start output buffering (capturing)
-        //ob_start();
+            // Start output buffering (capturing)
+            //ob_start();
 
-        //var_dump($project);
-        $project_root = $this->cfg["p_root"];
-        $project_name = $project["user"];
-        $db_host = '';
-        $db_pass = '';
-        $git_url = $project["git"];
-        $admin_email = 'www-data@ikt.khk.ee';
-        $members = array('valdur.kana@khk.ee');
+            //var_dump($project);
+            $project_root = $this->cfg["p_root"];
+            $project_name = $project["user"];
+            $db_host = '';
+            $db_pass = '';
+            $git_url = $project["git"];
+            $admin_email = 'www-data@ikt.khk.ee';
+            $members = array('valdur.kana@khk.ee');
 
-        $config = new stdClass;
-        $config->admin_email = $admin_email;
-        $config->changelog_link =
-            "http://ikt.khk.ee/~valdur.kana/vs15/koik_tagid/repo/$project_name";
-        $config->db_host = $db_host;
-        $config->db_user = "$project_name";
-        $config->db_base = "$project_name";
-        $config->db_pass = $db_pass;
-        $config->git_url = $git_url;
-        $config->project_name = $project_name;
-        $config->config_folder = "$project_root/$project_name";
-        $config->project_folder = "$project_root/$project_name";
-        $config->project_members = $members;
-        $config->emoji = '\xF0\x9F\x9A\x91';
+            $config = new stdClass;
+            $config->admin_email = $admin_email;
+            $config->changelog_link =
+                "http://ikt.khk.ee/~valdur.kana/vs15/koik_tagid/repo/$project_name";
+            $config->db_host = $db_host;
+            $config->db_user = "$project_name";
+            $config->db_base = "$project_name";
+            $config->db_pass = $db_pass;
+            $config->git_url = $git_url;
+            $config->project_name = $project_name;
+            $config->config_folder = "$project_root/$project_name";
+            $config->project_folder = "$project_root/$project_name";
+            $config->project_members = $members;
+            $config->emoji = '\xF0\x9F\x9A\x91';
 
-        $deploy = new Deploy($config);
-        //var_dump($deploy->last_commit);
-        //$this->projects[$project["user"]]["last_commit"]=$deploy->last_commit;
+            $deploy = new Deploy($config);
+
+            var_dump($deploy->need_update);
+            //die();
+
+            if (!$deploy->need_update) {
+                $changes = true;
+                $this->get_file_list($config->project_folder);
+                $this->analyze_tags($config->project_name);
+            }
+            //var_dump($deploy->last_commit);
+            //$this->projects[$project["user"]]["last_commit"]=$deploy->last_commit;
+        }
+
+        //Write changes to file
+        if ($changes) {
+            $this->save_projects("cache/projects");
         }
     }
 
-    private function get_file_list(){
-        $raw = explode("\n", shell_exec('find repo -name "*.css" -o -name "*.html" -o -name "*.php"' ));
+    function get_file_list($p_name=''){
+        $raw = explode("\n", shell_exec("find $p_name -name '*.css' -o -name '*.html' -o -name '*.php'" ));
         foreach($raw as $file) {
             if (empty($file)) {
                 continue;
@@ -138,35 +166,28 @@ class Worker {
         $this->tags= array_merge($this->tags, $tags);
     }
 
-    function analyze() {
-        $this->get_file_list();
-        foreach ($this->types as $type) {
-            $this->get_tags($type);
+    function analyze_tags($p_name){
+        $project = $this->projects[$p_name];
+
+        $this->projects[$project["user"]]["tags"]=array(
+            "unused" => array(),
+            "used" => array());
+
+        if (empty($project["files"])) {
+            $this->projects[$p_name]["tags"]["unused"]=$this->tags;
+            return ;
         }
-        $this->analyze_tags();
+        //$files="'".implode("' '", $project["files"])."'";
 
-    }
-
-
-    function analyze_tags(){
-        foreach($this->projects as $project){
-            if (empty($project["files"])){
-                $this->projects[$project["user"]]["tags"]=array(
-                    "unused" => $this->tags,
-                    "used" => array());
-                continue;
-            }
-            //$files="'".implode("' '", $project["files"])."'";
-            foreach($this->tags as $tag){
-                $r="unused";
-                foreach ($project["files"] as $file) {
-                    if (shell_exec("grep -h -c -m 1 '$tag' '$file'") != 0){
-                        $r="used";
-                        break;
-                    }
+        foreach($this->tags as $tag){
+            $r="unused";
+            foreach ($project["files"] as $file) {
+                if (shell_exec("grep -h -c -m 1 '$tag' '$file'") != 0){
+                    $r="used";
+                    break;
                 }
-                $this->projects[$project["user"]]["tags"][$r][]=$tag;
             }
+            $this->projects[$p_name]["tags"][$r][]=$tag;
         }
     }
 
@@ -188,27 +209,16 @@ class Worker {
                 $this->popular_tags[]=$k;
             }
         }
-        ksort($stat);
+        //ksort($stat);
         //var_dump($stat);
     }
 
     function clean_unused_tags(){
         foreach($this->projects as $p ){
-            $new_unused=array();
-            foreach($this->popular_tags as $tag){
-                if(empty($p["tags"])) {
-                    var_dump($p);
-                    break;
-                }
-                if(in_array($tag, $p["tags"]["unused"])){
-                    $new_unused[]=$tag;
-                }
-            }
-            $this->projects[$p["user"]]["tags"]["unused"]=$new_unused;
-
+            $this->projects[$p["user"]]["tags"]["unused"]=
+                array_intersect($this->popular_tags, $p["tags"]["unused"]);
         }
     }
 }
 
 ?>
-

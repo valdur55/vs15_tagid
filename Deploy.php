@@ -15,6 +15,7 @@ class Deploy
 {
     private $project_members;
     public $last_commit;
+    public $need_update = true;
     function __construct($conf)
     {
         // Convert emoji from \x escape sequence to quoted printable, adding a non-breaking space at the end
@@ -48,14 +49,17 @@ class Deploy
         }
     }
 
-    private function execute($msg, $cmd = null)
+    private function execute($msg, $cmd = null, $update = false)
     {
 
         $cmd = empty($cmd) ? $msg : $cmd;
-        $r =  (VERBOSE) ? "\n$msg...\n $cmd\n": "";
-        echo $r;
-        $exit_code = $this->proc_exec($cmd);
+        $r = "\n$msg...\n $cmd\n";
+        if (VERBOSE) {
+            echo "<pre>$r</pre>";
+        }
 
+        $this->needs_update = ($update && strpos($r , 'up-to-date') !== false) ? true  : false ;
+        $exit_code = $this->proc_exec($cmd);
         if ($exit_code > 0) {
 
             $br = '<br><br>';
@@ -171,7 +175,7 @@ class Deploy
 
     function checkout_project($pf)
     {
-        $this->execute('Checkouting project', "cd $pf && git checkout . && git pull ");
+        $this->execute('Checkouting project', "cd $pf && git checkout . && git pull ", true);
     }
 
     function recreate_uploads($project_name, $project_folder)

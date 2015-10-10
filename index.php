@@ -2,7 +2,7 @@
 // True korral kasutab kohalikku csv faili, ning jätab repo uuendamata.
 $b=true;
 define ("DEV", $b);
-define ("VERBOSE", $b);
+define ("VERBOSE", !$b);
 $min= (empty($_POST["min"])) ? 10 : $_POST["min"];
 define ("MIN_COUNT", $min);
 $drive_url= "https://docs.google.com/spreadsheets/d/".
@@ -12,6 +12,9 @@ $drive_url= "https://docs.google.com/spreadsheets/d/".
 require 'Worker.php';
 require 'Deploy.php';
 
+function ddump($data){
+    var_dump($data); //die();
+}
 $worker = new Worker($drive_url);
 $projects = $worker->get_projects();
 $errors = array();
@@ -56,7 +59,7 @@ $errors = array();
                 <td><a href="<?= $p["p_dir"] ?>"><?= $p["name"] ?></a></td>
                 <td><?= !empty($p['tags']["used"]) ? count($p["tags"]["used"]) : 0  ?></td>
                 <td><?= count($p['tags']["unused"]) ?></td>
-                <td><?= htmlspecialchars(implode("," ,  $p['tags']["unused"])) ?></td>
+                <td><?= htmlspecialchars(implode("," ,  $p['tags']['unused'])) ?></td>
         </tr>
 
         <? endforeach ?>
