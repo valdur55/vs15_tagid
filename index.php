@@ -25,7 +25,9 @@ $errors = array();
 <html lang="et">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <script type="application/javascript" src="http://tablesorter.com/jquery-latest.js"></script>
+    <script type="application/javascript" src="http://tablesorter.com/__jquery.tablesorter.js"></script>
+    <title>VS15 kõikide tagide projekti kontroll</title>
 </head>
 <body>
     <form method="post" action="?">
@@ -36,26 +38,21 @@ $errors = array();
     <div>
         Kasutamata tag'ide hulgas kuvatakse tag'e, mida kasutab vähemalt <?= MIN_COUNT ?> õpilast.
     </div>
-    <table border="1" >
+    <table id="projektid" border="1" >
         <thead>
-            <th>Nimi</th>
-            <th>Kasutatud tagid (arv)</th>
-            <th>Kasutamata tagid (arv)</th>
-            <th>Kasutamat tagid</th>
+        <?php $thead = array(
+            'Nimi',
+            'Kasutatud tagid (arv)',
+            'Kasutamata tagid(arv)',
+        );
+            foreach ($thead as $col): ?>
+             <th><a href="#"><?= $col?></a></th>
+        <? endforeach ?>
+        <th class="{sorter: false}">Kaustamata tagid</th>
         </thead>
 
         <?php foreach ($projects as $p): ?>
-        <tr>
-                <?php
-                if (empty($p["name"]) ) {
-                    $errors["noname"][]=$p;
-                    continue;
-                }
-                    if (empty($p["tags"])) {
-                        $errors["notags"][]=$p;
-                        continue;
-                    }
-                ?>
+            <tr>
                 <td><a href="<?= $p["p_dir"] ?>"><?= $p["name"] ?></a></td>
                 <td><?= !empty($p['tags']["used"]) ? count($p["tags"]["used"]) : 0  ?></td>
                 <td><?= count($p['tags']["unused"]) ?></td>
@@ -65,4 +62,10 @@ $errors = array();
         <? endforeach ?>
     </table>
 </body>
+<script type="text/javascript">$(document).ready(function()
+        {
+            $("#projektid").tablesorter();
+        }
+    );
+</script>
 </html>
