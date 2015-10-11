@@ -214,9 +214,8 @@ class Worker {
     }
 
     function clean_unused_tags(){
-        foreach($this->projects as $p ){
-            $this->projects[$p["user"]]["tags"]["unused"]=
-                array_intersect($this->popular_tags, $p["tags"]["unused"]);
+        foreach($this->projects as $p_name => $p ){
+            $this->projects[$p_name]["tags"]["unused"]=array_diff($this->popular_tags,$p["tags"]["used"]);
         }
     }
 }
