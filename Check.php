@@ -15,6 +15,7 @@ class Check {
     var $types = array("html", "css");
     var $stat = array();
     var $popular_tags = array();
+
     function Check($csv_link) {
         $this->get_tags_from_cache("cache/projects");
         $this->set_projects($csv_link);
@@ -29,6 +30,7 @@ class Check {
         //var_dump($this->projects);
         $this->clean_unused_tags();
     }
+
     function get_tags_from_cache($file) {
         if (file_exists($file)) {
             $f = fopen($file, "r");
