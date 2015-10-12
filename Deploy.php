@@ -54,7 +54,7 @@ class Deploy
 
         $cmd = empty($cmd) ? $msg : $cmd;
         $r = "\n$msg...\n $cmd\n";
-        if (VERBOSE) {
+        if (VERBOSE || FORCE_UPDATE) {
             echo "<pre>$r</pre>";
         }
 

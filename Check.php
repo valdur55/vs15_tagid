@@ -3,7 +3,7 @@
 
 define ("NAME", 0);
 
-class Worker {
+class Check {
     var $projects = array();
     var $spreadsheet_url="";
     var $repo_col = Array(2,5,8);
@@ -15,13 +15,16 @@ class Worker {
     var $types = array("html", "css");
     var $stat = array();
     var $popular_tags = array();
-    function Worker($csv_link) {
+    function Check($csv_link) {
         $this->get_tags_from_cache("cache/projects");
         $this->set_projects($csv_link);
         foreach ($this->types as $type) {
             $this->get_tags($type);
         }
-        //$this->deploy();
+        if (UPDATE || FORCE_UPDATE) {
+            echo "update";
+            $this->deploy();
+        }
         $this->get_tags_usage(MIN_COUNT);
         //var_dump($this->projects);
         $this->clean_unused_tags();
@@ -131,7 +134,7 @@ class Worker {
             //var_dump(!$deploy->need_update);
             //die();
 
-            if ($deploy->need_update) {
+            if (!$deploy->need_update || FORCE_UPDATE) {
                 $changes = true;
                 $this->get_file_list($config->project_folder);
                 $this->analyze_tags($config->project_name);
@@ -213,7 +216,11 @@ class Worker {
     function get_tags_usage($min_usage){
         $rstat = array();
         $stat = array();
-        foreach($this->projects as $p){
+        foreach($this->projects as $p_name => $p){
+            if (empty($p["tags"]["used"])) {
+                echo "$p_name pole kasutanud ühtegi tag-i";
+                continue;
+            }
             foreach($p["tags"]["used"] as $tag){
                 if (empty($rstat[$tag])) {
                     $rstat[$tag] = 1;

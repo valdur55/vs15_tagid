@@ -11,13 +11,18 @@ $drive_url= "https://docs.google.com/spreadsheets/d/".
         "gid=257327911".
         "&single=true".
         "&output=csv";
-require 'Worker.php';
+
+$update =  (!empty($_POST["update"])) ? $_POST["update"] : false ;
+$force_update = (!empty($_GET["force"])) ? $_GET["force"] : false ;
+define ( "UPDATE" , $update );
+define ( "FORCE_UPDATE" , $force_update );
+require 'Check.php';
 require 'Deploy.php';
 
 function ddump($data){
     var_dump($data); //die();
 }
-$worker = new Worker($drive_url);
+$worker = new Check($drive_url);
 $projects = $worker->get_projects();
 $errors = array();
 ?>
