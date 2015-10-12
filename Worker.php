@@ -128,7 +128,7 @@ class Worker {
 
             $deploy = new Deploy($config);
 
-            var_dump($deploy->need_update);
+            //var_dump(!$deploy->need_update);
             //die();
 
             if (!$deploy->need_update) {
@@ -178,16 +178,35 @@ class Worker {
             return ;
         }
         //$files="'".implode("' '", $project["files"])."'";
-
-        foreach($this->tags as $tag){
-            $r="unused";
+        if (DEV) {
+            $data =  new stdClass();
             foreach ($project["files"] as $file) {
-                if (shell_exec("grep -h -c -m 1 '$tag' '$file'") != 0){
-                    $r="used";
-                    break;
+                $dom = new DOMDocument;
+                $dom->loadHTMLFile($file);
+                $tags = $dom->getElementsByTagName('*');
+                foreach ($tags as $tag) {
+                    $data->html[$tag->nodeName]=1;
+                    foreach ($tag->attributes as $att) {
+                        if ($att->nodeName === 'style') {
+                            $style = $att->nodeValue;
+                            if (!empty($style)) {
+                                $data->css[$style]=1;
+                            }
+                        }
+                    }
                 }
             }
-            $this->projects[$p_name]["tags"][$r][]=$tag;
+            var_dump($data->css);
+            $this->projects[$p_name]["tags"]["used"]=array_keys($data->html);
+        } else {
+            foreach($this->tags as $tag){
+                foreach ($project["files"] as $file) {
+                    if (shell_exec("grep -h -c -m 1 '$tag' '$file'") != 0){
+                        $this->projects[$p_name]["tags"]["used"][]=$tag;
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -214,9 +233,9 @@ class Worker {
     }
 
     function clean_unused_tags(){
-        foreach($this->projects as $p ){
-            $this->projects[$p["user"]]["tags"]["unused"]=
-                array_intersect($this->popular_tags, $p["tags"]["unused"]);
+        foreach($this->projects as $p_name => $p ){
+            $this->projects[$p_name]["tags"]["unused"]=
+                array_diff($this->popular_tags,$p["tags"]["used"]);
         }
     }
 }

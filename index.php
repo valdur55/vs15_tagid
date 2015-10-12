@@ -2,13 +2,15 @@
 // True korral kasutab kohalikku csv faili, ning jätab repo uuendamata.
 $b=true;
 define ("DEV", $b);
-define ("VERBOSE", !$b);
+define ("VERBOSE", $b);
 $min= (empty($_POST["min"])) ? 10 : $_POST["min"];
 define ("MIN_COUNT", $min);
 $drive_url= "https://docs.google.com/spreadsheets/d/".
         "1j44KDS8Y_fuRkz7-9jjvjp1FQamFJPIgpGTpZFFN5UQ/".
-        "pub?output=csv";
-
+        "pub?".
+        "gid=257327911".
+        "&single=true".
+        "&output=csv";
 require 'Worker.php';
 require 'Deploy.php';
 
