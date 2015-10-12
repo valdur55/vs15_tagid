@@ -131,7 +131,7 @@ class Worker {
             //var_dump(!$deploy->need_update);
             //die();
 
-            if (!$deploy->need_update) {
+            if ($deploy->need_update) {
                 $changes = true;
                 $this->get_file_list($config->project_folder);
                 $this->analyze_tags($config->project_name);

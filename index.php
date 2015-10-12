@@ -1,8 +1,8 @@
 <?php
 // True korral kasutab kohalikku csv faili, ning jätab repo uuendamata.
 $b=true;
-define ("DEV", $b);
-define ("VERBOSE", $b);
+define ("DEV", !$b);
+define ("VERBOSE", !$b);
 $min= (empty($_POST["min"])) ? 10 : $_POST["min"];
 define ("MIN_COUNT", $min);
 $drive_url= "https://docs.google.com/spreadsheets/d/".
@@ -34,7 +34,9 @@ $errors = array();
 <body>
     <form method="post" action="?">
         <label for="min">Minimaalne õpilaste arv:</label>
-        <input value="<?= $min ?>" type="number" name="min" min=1 max="<?= count($projects) ?>">
+        <input value="<?= $min ?>" type="number" name="min" min=1 max="<?= count($projects) ?>"><br>
+        <label for="update">Uuenda:</label>
+        <input id="update" type="checkbox"></br>
         <button>Saada</button>
     </form>
     <div>
