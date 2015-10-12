@@ -10,17 +10,27 @@ class Check {
     var $url_error = Array();
     var $cfg = Array(
         "p_root" => "repo",
+
     );
     var $tags = array();
-    var $types = array("html", "css");
+    var $types = array("html" => [], "css" => []);
     var $stat = array();
     var $popular_tags = array();
-
+    
     function Check($csv_link) {
+        $this->types["html"] = [
+            "separator" => "><",
+                "find" => "-name '*.html' -o -name '*.php'"
+            ];
+        $this->types["css"] = [
+            'separator' => ",",
+            "find" => "-name '*.css'"
+            ];
+
         $this->get_tags_from_cache("cache/projects");
         $this->set_projects($csv_link);
-        foreach ($this->types as $type) {
-            $this->get_tags($type);
+        foreach ($this->types as $type => $val) {
+            $this->get_tags($type, $val);
         }
         if (UPDATE || FORCE_UPDATE) {
             echo "update";
@@ -151,24 +161,22 @@ class Check {
         }
     }
 
-    function get_file_list($p_name=''){
-        $raw = explode("\n", shell_exec("find $p_name -name '*.css' -o -name '*.html' -o -name '*.php'" ));
+    function get_file_list($p_name, $type,$val){
+        $raw = explode("\n", shell_exec("find $p_name ". $val["find"] ));
         foreach($raw as $file) {
             if (empty($file)) {
                 continue;
             }
             $user = explode("/",$file);
-            $this->projects[$user[1]]["files"][]=$file;
+            $this->projects[$user[1]]["files"]["type"]=$FILE;
          }
     }
 
-    private function get_tags($type) {
+    private function get_tags($type, $val ) {
         $filename = $type."_tags";
         $f = fopen($filename, "r") or die("Can't open ".$filename);
         $line = trim(fgets($f));
-        $separator = ($type == "html") ? "><" : "," ;
-        $tags=explode($separator, $line);
-        $this->tags= array_merge($this->tags, $tags);
+        $this->tags[$type] = explode($val["separator"], $line);
     }
 
     function analyze_tags($p_name){
