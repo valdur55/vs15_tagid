@@ -41,7 +41,7 @@ $errors = array();
         <label for="min">Minimaalne õpilaste arv:</label>
         <input value="<?= $min ?>" type="number" name="min" min=1 max="<?= count($projects) ?>"><br>
         <label for="update">Uuenda:</label>
-        <input id="update" type="checkbox"></br>
+        <input id="update" name="update" type="checkbox"></br>
         <button>Saada</button>
     </form>
     <div>
