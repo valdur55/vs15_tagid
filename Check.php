@@ -206,7 +206,7 @@ class Check {
         } else {
             foreach($this->tags as $tag){
                 foreach ($project["files"] as $file) {
-                    if (shell_exec("grep -h -c -m 1 '$tag' '$file'") != 0){
+                    if (shell_exec("grep -i -h -c -m 1 '$tag' '$file'") != 0){
                         $this->projects[$p_name]["tags"]["used"][]=$tag;
                         break;
                     }
