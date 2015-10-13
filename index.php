@@ -32,8 +32,8 @@ $errors = array();
 <html lang="et">
 <head>
     <meta charset="UTF-8">
-    <script type="application/javascript" src="http://tablesorter.com/jquery-latest.js"></script>
-    <script type="application/javascript" src="http://tablesorter.com/__jquery.tablesorter.js"></script>
+    <script type="application/javascript" src="./js/tablesorter.com/jquery-latest.js"></script>
+    <script type="application/javascript" src="./js/tablesorter.com/__jquery.tablesorter.js"></script>
     <title>VS15 kõikide tagide projekti kontroll</title>
 </head>
 <body>
