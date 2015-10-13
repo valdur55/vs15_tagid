@@ -8,7 +8,7 @@
 <?php
 
 $dom = new DOMDocument;
-$dom->loadHTMLFile("http://localhost/koik_tagid/repo/LauriNomtak/assets/stylesheet.css");
+$load = $dom->loadHTMLFile("repo/mmrtn/index.html");
 $tags = $dom->getElementsByTagName('*');
 echo "<pre>";
 $data =  new stdClass();

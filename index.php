@@ -20,7 +20,7 @@ require 'Check.php';
 require 'Deploy.php';
 
 function ddump($data){
-    var_dump($data); //die();
+    var_dump($data); die();
 }
 $worker = new Check($drive_url);
 $projects = $worker->get_projects();

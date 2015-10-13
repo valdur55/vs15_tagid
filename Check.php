@@ -26,8 +26,9 @@ class Check {
             'separator' => ",",
             "find" => "-name '*.css'"
             ];
-
-        $this->get_tags_from_cache("cache/projects");
+        if (!FORCE_UPDATE) {
+            $this->get_tags_from_cache("cache/projects");
+        }
         $this->set_projects($csv_link);
         foreach ($this->types as $type => $val) {
             $this->get_tags($type, $val);
@@ -161,15 +162,17 @@ class Check {
         }
     }
 
-    function get_file_list($p_name, $type,$val){
+    function get_file_list($p_name){
+        foreach ($this->types as $type => $val) {
         $raw = explode("\n", shell_exec("find $p_name ". $val["find"] ));
         foreach($raw as $file) {
             if (empty($file)) {
                 continue;
             }
             $user = explode("/",$file);
-            $this->projects[$user[1]]["files"]["type"]=$FILE;
-         }
+            $this->projects[$user[1]]["files"][$type][]=$file;
+        }
+        }
     }
 
     private function get_tags($type, $val ) {
@@ -191,33 +194,38 @@ class Check {
             return ;
         }
         //$files="'".implode("' '", $project["files"])."'";
-        if (DEV) {
-            $data =  new stdClass();
-            foreach ($project["files"] as $file) {
-                $dom = new DOMDocument;
-                $dom->loadHTMLFile($file);
-                $tags = $dom->getElementsByTagName('*');
-                foreach ($tags as $tag) {
-                    $data->html[$tag->nodeName]=1;
-                    foreach ($tag->attributes as $att) {
-                        if ($att->nodeName === 'style') {
-                            $style = $att->nodeValue;
-                            if (!empty($style)) {
-                                $data->css[$style]=1;
-                            }
+        $data =  new stdClass();
+
+        $type="html";
+        var_dump($project["files"][$type]);
+        foreach ($project["files"][$type] as $file) {
+            $dom = new DOMDocument;
+            @$dom->loadHTMLFile($file);
+            $tags = $dom->getElementsByTagName('*');
+            foreach ($tags as $tag) {
+                $data->html[$tag->nodeName]=1;
+                foreach ($tag->attributes as $att) {
+                    if ($att->nodeName === 'style') {
+                        $style = $att->nodeValue;
+                        if (!empty($style)) {
+                            $data->css[$style]=1;
                         }
                     }
                 }
             }
-            var_dump($data->css);
-            $this->projects[$p_name]["tags"]["used"]=array_keys($data->html);
-        } else {
-            foreach($this->tags as $tag){
-                foreach ($project["files"] as $file) {
-                    if (shell_exec("grep -i -h -c -m 1 '$tag' '$file'") != 0){
-                        $this->projects[$p_name]["tags"]["used"][]=$tag;
-                        break;
-                    }
+        }
+        var_dump($data->css);
+        $this->projects[$p_name]["tags"]["used"]=array_keys($data->html);
+        $type = "css";
+        foreach($this->tags[$type] as $tag){
+            if (empty($project["files"][$type] )){
+                continue;
+            }
+
+            foreach ($project["files"]["css"] as $file) {
+                if (shell_exec("grep -i -h -c -m 1 '$tag' '$file'") != 0){
+                    $this->projects[$p_name]["tags"]["used"][]=$tag;
+                    break;
                 }
             }
         }
