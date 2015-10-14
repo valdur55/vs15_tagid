@@ -14,8 +14,11 @@ $drive_url= "https://docs.google.com/spreadsheets/d/".
 
 $update =  (!empty($_POST["update"])) ? $_POST["update"] : false ;
 $force_update = (!empty($_GET["force"])) ? $_GET["force"] : false ;
+
+define ("UPDATE_PERSON" , (!empty($_GET["user"])) ? $_GET["user"] : false );
 define ( "UPDATE" , $update );
 define ( "FORCE_UPDATE" , $force_update );
+
 require 'Check.php';
 require 'Deploy.php';
 

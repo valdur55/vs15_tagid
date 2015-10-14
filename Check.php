@@ -16,27 +16,21 @@ class Check {
     var $types = array("html" => [], "css" => []);
     var $stat = array();
     var $popular_tags = array();
-    
     function Check($csv_link) {
-        $this->types["html"] = [
-                "find" => "-name '*.html' -o -name '*.php'"
-            ];
-        $this->types["css"] = [
-            "find" => "-name '*.css'"
+        $this->types = [
+            "html" => "-name '*.html' -o -name '*.php'",
+            "css" =>  "-name '*.css'"
             ];
         if (!FORCE_UPDATE) {
             $this->get_tags_from_cache("cache/projects");
         }
-        $this->set_projects($csv_link);
-        foreach ($this->types as $type => $val) {
-            $this->get_tags($type, $val);
-        }
-        if (UPDATE || FORCE_UPDATE) {
-            echo "update";
-            $this->deploy();
+        if (UPDATE || FORCE_UPDATE || UPDATE_PERSON ) {
+            $this->set_tags();
+            $this->set_projects($csv_link);
+            $this->deploy(UPDATE_PERSON);
+            UPDATE_PERSON ? die(UPDATE_PERSON." update finished") : '';
         }
         $this->get_tags_usage(MIN_COUNT);
-        //var_dump($this->projects);
         $this->clean_unused_tags();
     }
 
@@ -102,17 +96,22 @@ class Check {
         }
 
         fclose($file);
-        echo "<pre>";
-        //var_dump($this->projects);
-            print_r($this->url_error);
-        echo "</pre>";
-
     }
 
 
-    function deploy(){
+    function deploy($user=null){
         $changes = false;
-        foreach ($this->projects as $project) {
+        if (empty($user)) {
+            $p = $this->projects ;
+        } else {
+            if ( array_key_exists($user, $this->projects)) {
+                $p = [$this->projects[$user]];
+            } else {
+                die("Github user: $user  is not known");
+            }
+        }
+
+        foreach ($projects as $project) {
             // Start output buffering (capturing)
             //ob_start();
 
@@ -161,23 +160,27 @@ class Check {
     }
 
     function get_file_list($p_name){
-        foreach ($this->types as $type => $val) {
-        $raw = explode("\n", shell_exec("find $p_name ". $val["find"] ));
-        foreach($raw as $file) {
-            if (empty($file)) {
-                continue;
+        foreach ($this->types as $type => $find_arg) {
+            $raw = explode("\n", shell_exec("find $p_name ". $find_arg ));
+            foreach($raw as $file) {
+                if (empty($file)) {
+                    continue;
+                }
+                $user = explode("/",$file);
+                $this->projects[$user[1]]["files"][$type][]=$file;
             }
-            $user = explode("/",$file);
-            $this->projects[$user[1]]["files"][$type][]=$file;
-        }
         }
     }
-
-    private function get_tags($type, $val ) {
-        $filename = $type."_tags";
-        $f = fopen($filename, "r") or die("Can't open ".$filename);
-        $line = trim(file_get_contents($filename));
-        $this->tags[$type] = explode("\n", $line);
+    function drop_long_css_tags() {
+        //foreach ($this-
+    }
+    private function set_tags() {
+        foreach ($this->types as $type => $val) {
+            $filename = $type."_tags";
+            $f = fopen($filename, "r") or die("Can't open ".$filename);
+            $line = trim(file_get_contents($filename));
+            $this->tags[$type] = explode("\n", $line);
+        }
     }
 
     function analyze_tags($p_name){
