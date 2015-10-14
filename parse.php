@@ -8,8 +8,9 @@
 <?php
 
 $dom = new DOMDocument;
-$load = $dom->loadHTMLFile("repo/mmrtn/index.html");
-$tags = $dom->getElementsByTagName('*');
+$load = @$dom->loadHTMLFile("ref_html_dtd.asp");
+//$tags = $dom->getElementsByTagName('*');
+$tags = $dom->getElementsByTagName('td');
 echo "<pre>";
 $data =  new stdClass();
 foreach ($tags as $tag) {
@@ -26,6 +27,7 @@ foreach ($tags as $tag) {
         }
     }
 }
+var_dump($data);
 //$data->html = array_keys($data->html);
 print_r($data);
 echo "</pre>";

@@ -19,11 +19,9 @@ class Check {
     
     function Check($csv_link) {
         $this->types["html"] = [
-            "separator" => "><",
                 "find" => "-name '*.html' -o -name '*.php'"
             ];
         $this->types["css"] = [
-            'separator' => ",",
             "find" => "-name '*.css'"
             ];
         if (!FORCE_UPDATE) {
@@ -178,8 +176,8 @@ class Check {
     private function get_tags($type, $val ) {
         $filename = $type."_tags";
         $f = fopen($filename, "r") or die("Can't open ".$filename);
-        $line = trim(fgets($f));
-        $this->tags[$type] = explode($val["separator"], $line);
+        $line = trim(file_get_contents($filename));
+        $this->tags[$type] = explode("\n", $line);
     }
 
     function analyze_tags($p_name){
@@ -214,7 +212,9 @@ class Check {
                 }
             }
         }
-        var_dump($data->css);
+        if (!empty($data->css)) {
+            var_dump($data->css);
+        }
         $this->projects[$p_name]["tags"]["used"]=array_keys($data->html);
         $type = "css";
         foreach($this->tags[$type] as $tag){
