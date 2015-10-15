@@ -205,6 +205,8 @@ class Check {
             $tags = $dom->getElementsByTagName('*');
             foreach ($tags as $tag) {
                 $data->html[$tag->nodeName]=1;
+
+                //TODO: use $tag->getAttribute("style")
                 foreach ($tag->attributes as $att) {
                     if ($att->nodeName === 'style') {
                         $style = $att->nodeValue;
