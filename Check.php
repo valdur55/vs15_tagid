@@ -26,6 +26,7 @@ class Check {
         }
         if (UPDATE || FORCE_UPDATE || UPDATE_PERSON ) {
             $this->set_tags();
+            $this->set_needed_css();
             $this->set_projects($csv_link);
             $this->deploy(UPDATE_PERSON);
             UPDATE_PERSON ? die(UPDATE_PERSON." update finished") : '';
@@ -49,6 +50,41 @@ class Check {
     function get_projects() {
         return $this->projects;
     }
+
+    function set_needed_css() {
+
+        $dom = new DOMDocument;
+        @$dom->loadHTMLFile("css3_browsersupport.asp");
+        $dom = $dom->getElementsByTagName('table')->item(0);
+        $rows = $dom->getElementsByTagName('tr');
+        $tags = [];
+        foreach ($rows as $row) {
+            $i=0;
+            $cols = $row->getElementsByTagName('td');
+
+            foreach ($cols as $col) {
+
+                if ($i++ === 0 ) {
+                    $name=$col->nodeValue;
+                    $data->raw[$name]=0;
+                    continue;
+                }
+
+                if (!empty($col->nodeValue)) {
+                    $data->raw[$name]+=1;
+                }
+            }
+        }
+
+        foreach($data->raw as $key => $val) {
+            if ($val >= 4) {
+                $tags[]=$key;
+            }
+        }
+        var_dump($tags);
+        $this->tags["css"]=$tags;
+    }
+
     function set_projects($csv) {
         $csv_link= (DEV) ? "pub?output=csv": $csv;
         $file = fopen($csv_link, "r") or false;
