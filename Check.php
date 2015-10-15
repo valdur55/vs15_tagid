@@ -81,7 +81,6 @@ class Check {
                 $tags[]=$key;
             }
         }
-        var_dump($tags);
         $this->tags["css"]=$tags;
     }
 
