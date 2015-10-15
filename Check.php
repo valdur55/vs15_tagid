@@ -61,11 +61,13 @@ class Check {
         foreach ($rows as $row) {
             $i=0;
             $cols = $row->getElementsByTagName('td');
+            $data =  new stdClass();
 
             foreach ($cols as $col) {
 
                 if ($i++ === 0 ) {
                     $name=$col->nodeValue;
+
                     $data->raw[$name]=0;
                     continue;
                 }
@@ -146,7 +148,7 @@ class Check {
             }
         }
 
-        foreach ($projects as $project) {
+        foreach ($p as $project) {
             // Start output buffering (capturing)
             //ob_start();
 
