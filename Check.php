@@ -58,10 +58,11 @@ class Check {
         $dom = $dom->getElementsByTagName('table')->item(0);
         $rows = $dom->getElementsByTagName('tr');
         $tags = [];
+        $data =  new stdClass();
+
         foreach ($rows as $row) {
             $i=0;
             $cols = $row->getElementsByTagName('td');
-            $data =  new stdClass();
 
             foreach ($cols as $col) {
 
