@@ -19,17 +19,19 @@ class Check {
     function Check($csv_link) {
         $this->types = [
             "html" => "-name '*.html' -o -name '*.php'",
-            "css" =>  "-name '*.css'"
+            "css" =>  "-name '*.css'",
+            "black" => "",
             ];
         if (!FORCE_UPDATE) {
             $this->get_tags_from_cache("cache/projects");
         }
         if (UPDATE || FORCE_UPDATE || UPDATE_PERSON ) {
+            //$this->get_blacklist();
             $this->set_tags();
             $this->set_needed_css();
             $this->set_projects($csv_link);
             $this->deploy(UPDATE_PERSON);
-            UPDATE_PERSON ? die(UPDATE_PERSON." update finished") : '';
+            UPDATE_PERSON ? die(UPDATE_PERSON." update finished") : '' ;
         }
         $this->get_tags_usage(MIN_COUNT);
         $this->clean_unused_tags();
@@ -57,7 +59,6 @@ class Check {
         @$dom->loadHTMLFile("css3_browsersupport.asp");
         $dom = $dom->getElementsByTagName('table')->item(0);
         $rows = $dom->getElementsByTagName('tr');
-        $tags = [];
         $data =  new stdClass();
 
         foreach ($rows as $row) {
@@ -68,23 +69,24 @@ class Check {
 
                 if ($i++ === 0 ) {
                     $name=$col->nodeValue;
-
                     $data->raw[$name]=0;
                     continue;
                 }
 
                 if (!empty($col->nodeValue)) {
-                    $data->raw[$name]+=1;
+                    if (!empty($name)) {
+                        $data->raw[$name]+=1;
+                    }
                 }
             }
         }
 
         foreach($data->raw as $key => $val) {
-            if ($val >= 4) {
-                $tags[]=$key;
+            $this->tags["css"][]=$key;
+            if ($val < 4 or substr_count("-", $val) >= 2 ) {
+                $this->tags["black"][]=$key;
             }
         }
-        $this->tags["css"]=$tags;
     }
 
     function set_projects($csv) {
@@ -199,6 +201,10 @@ class Check {
 
     function get_file_list($p_name){
         foreach ($this->types as $type => $find_arg) {
+            if (empty($find_arg)) {
+                continue;
+            }
+
             $raw = explode("\n", shell_exec("find $p_name ". $find_arg ));
             foreach($raw as $file) {
                 if (empty($file)) {
@@ -236,7 +242,6 @@ class Check {
         $data =  new stdClass();
 
         $type="html";
-        var_dump($project["files"][$type]);
         foreach ($project["files"][$type] as $file) {
             $dom = new DOMDocument;
             @$dom->loadHTMLFile($file);
@@ -272,6 +277,9 @@ class Check {
                 }
             }
         }
+        $black = array_intersect($this->tags["black"], $this->projects[$p_name]["tags"]["used"]);
+        $this->projects[$p_name]["tags"]["used"] = array_diff($this->projects[$p_name]["tags"]["used"], $black);
+        $this->projects[$p_name]["tags"]["black"] = $black;
     }
 
     function get_tags_usage($min_usage){
@@ -302,6 +310,7 @@ class Check {
 
     function clean_unused_tags(){
         foreach($this->projects as $p_name => $p ){
+            //ddump($this->tags);
             $this->projects[$p_name]["tags"]["unused"]=array_diff($this->popular_tags,$p["tags"]["used"]);
         }
     }
