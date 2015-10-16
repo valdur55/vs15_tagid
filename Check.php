@@ -220,9 +220,8 @@ class Check {
     }
     private function set_tags() {
         foreach ($this->types as $type => $val) {
-            $filename = $type."_tags";
-            $f = fopen($filename, "r") or die("Can't open ".$filename);
-            $line = trim(file_get_contents($filename));
+            $filename = 'tags/'.$type;
+            $line = trim(file_get_contents($filename)) or die("Can't open ".$filename);
             $this->tags[$type] = explode("\n", $line);
         }
     }
