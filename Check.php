@@ -29,6 +29,9 @@ class Check {
             //$this->get_blacklist();
             $this->set_tags();
             $this->set_needed_css();
+            //ddump($this->tags["css_table"]);
+            ddump(array_diff($this->tags["css_file"], $this->tags["css_table"]));
+            //ddump($this->tags["black"]);
             $this->set_projects($csv_link);
             $this->deploy(UPDATE_PERSON);
             UPDATE_PERSON ? die(UPDATE_PERSON." update finished") : '' ;
@@ -82,6 +85,7 @@ class Check {
         }
 
         foreach($data->raw as $key => $val) {
+            $this->tags["css_table"][]=$key;
             $this->tags["css"][]=$key;
             if ($val < 4 or substr_count("-", $val) >= 2 ) {
                 $this->tags["black"][]=$key;
@@ -222,7 +226,7 @@ class Check {
         foreach ($this->types as $type => $val) {
             $filename = 'tags/'.$type;
             $line = trim(file_get_contents($filename)) or die("Can't open ".$filename);
-            $this->tags[$type] = explode("\n", $line);
+            $this->tags[$type."_file"] =  $this->tags[$type] = explode("\n", $line);
         }
     }
 
@@ -303,13 +307,10 @@ class Check {
                 $this->popular_tags[]=$k;
             }
         }
-        //ksort($stat);
-        //var_dump($stat);
     }
 
     function clean_unused_tags(){
         foreach($this->projects as $p_name => $p ){
-            //ddump($this->tags);
             $this->projects[$p_name]["tags"]["unused"]=array_diff($this->popular_tags,$p["tags"]["used"]);
         }
     }

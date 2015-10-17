@@ -6,10 +6,60 @@
 </head>
 <body>
 <?php
-
+define("W3C", "http://www.w3schools.com/cssref/");
+define("CACHE", "../cache/css_raw/");
 $dom = new DOMDocument;
-@$dom->loadHTMLFile("css3_browsersupport.asp");
-$dom = $dom->getElementsByTagName('table')->item(0);
+@$dom->loadHTMLFile("props");
+$css= new stdClass();
+$dom = $dom->getElementsByTagName('a');
+foreach($dom as $line){
+    $name= $line->nodeValue;
+    if (substr_count($name, "-") > 1) {
+        $css->long[]=$name;
+        continue;
+    }
+
+    $link = $line->getAttribute("href");
+    $css->links[$name]=$link;
+    $support = new DOMDocument();
+
+    if (file_exists(CACHE.$link)) {
+        $support->loadHTMLFile(CACHE.$link);
+    } else {
+        $support->loadHTMLFile(W3C.$link);
+        if (!empty($support)) {
+            $support->saveHTMLFile(CACHE.$link);
+        }
+    }
+
+    foreach ($support->getElementsByTagName("table") as $table){
+        if ($table->getAttribute("class") == "browserref notranslate") {
+
+            $depr = 0;
+
+            if ($table->getElementsByTagName("tr")->length > 2) {
+                //var_dump($name); // skip tags which have more than one row for versions.
+                continue;
+            }
+
+            foreach ($table->getElementsByTagName("td") as $col) {
+                if ($col->nodeValue === "Not supported" ) {
+                    $depr++;
+                }
+            }
+
+            if ($depr < 3) {
+                $css->stat[]=$name;
+            }
+
+        }
+    }
+}
+
+file_put_contents(CACHE."tags", implode("\n", array_values(($css->stat))));
+
+var_dump($css->stat); die();
+
 $rows = $dom->getElementsByTagName('tr');
 
 
