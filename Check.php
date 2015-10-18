@@ -10,7 +10,7 @@ class Check {
     var $repo_col = Array(2,5,8);
     var $url_error = Array();
     var $cfg = Array(
-        "p_root" => "repo",
+        "p_root" => "uploads/repo",
 
     );
     var $tags = array();
