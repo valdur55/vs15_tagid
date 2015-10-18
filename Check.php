@@ -193,8 +193,9 @@ class Check {
             //die();
 
             if (!$deploy->need_update || FORCE_UPDATE) {
+                echo "UPD";
                 $changes = true;
-                $this->get_file_list($config->project_folder);
+                $this->get_file_list($config->project_name);
                 $this->analyze_tags($config->project_name);
             }
             //var_dump($deploy->last_commit);
@@ -208,24 +209,21 @@ class Check {
     }
 
     function get_file_list($p_name){
+        $project = $this->projects[$p_name];
         foreach ($this->types as $type => $find_arg) {
             if (empty($find_arg)) {
                 continue;
             }
-
-            $raw = explode("\n", shell_exec("find $p_name ". $find_arg ));
+            $raw = explode("\n", shell_exec("find " .  $project['p_dir'] ." " . $find_arg  ));
             foreach($raw as $file) {
                 if (empty($file)) {
                     continue;
                 }
-                $user = explode("/",$file);
-                $this->projects[$user[1]]["files"][$type][]=$file;
+                $this->projects[$p_name]["files"][$type][]=$file;
             }
         }
     }
-    function drop_long_css_tags() {
-        //foreach ($this-
-    }
+
     private function set_tags() {
         foreach ($this->types as $type => $val) {
             $filename = 'tags/'.$type;
@@ -285,6 +283,7 @@ class Check {
             }
         }
         $black = array_intersect($this->tags["black"], $this->projects[$p_name]["tags"]["used"]);
+        //ddump($black); die();
         $this->projects[$p_name]["tags"]["used"] = array_diff($this->projects[$p_name]["tags"]["used"], $black);
         $this->projects[$p_name]["tags"]["black"] = $black;
     }
