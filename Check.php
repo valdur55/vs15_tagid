@@ -2,6 +2,7 @@
 <?php
 
 define ("NAME", 0);
+include("lib/get_supported_css.php");
 
 class Check {
     var $projects = array();
@@ -16,6 +17,7 @@ class Check {
     var $types = array("html" => [], "css" => []);
     var $stat = array();
     var $popular_tags = array();
+
     function Check($csv_link) {
         $this->types = [
             "html" => "-name '*.html' -o -name '*.php'",
@@ -29,13 +31,15 @@ class Check {
             //$this->get_blacklist();
             $this->set_tags();
             $this->set_needed_css();
+            $from_menu = get_from_menu_css_tags();
             //ddump($this->tags["css_table"]);
-            ddump(array_diff($this->tags["css_file"], $this->tags["css_table"]));
-            //ddump($this->tags["black"]);
+            $css_not_listed= array_diff($this->tags["css_file"], $this->tags["css_table"], $from_menu->all);
+            $this->tags["black"] = array_unique(array_merge($this->tags["black"], $css_not_listed, $from_menu->stat["black"]));
             $this->set_projects($csv_link);
             $this->deploy(UPDATE_PERSON);
             UPDATE_PERSON ? die(UPDATE_PERSON." update finished") : '' ;
         }
+
         $this->get_tags_usage(MIN_COUNT);
         $this->clean_unused_tags();
     }
