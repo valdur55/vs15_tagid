@@ -170,7 +170,7 @@ class Deploy
 
     function clone_project($git_url, $pf)
     {
-        $this->execute('Cloning project from Github', "git clone --depth=2 $git_url $pf");
+        $this->execute('Cloning project from Github', "git clone --depth=1 $git_url $pf");
     }
 
     function checkout_project($pf)
