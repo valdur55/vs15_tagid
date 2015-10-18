@@ -70,7 +70,7 @@ $errors = array();
                 <td><?= !empty($p['tags']["black"]) ? count($p["tags"]["black"]) : 0  ?></td>
                 <td><?= !empty($p['tags']["used"]) ? count($p["tags"]["used"]) : 0  ?></td>
                 <td><?= count($p['tags']["unused"]) ?></td>
-                <td><?= htmlspecialchars(implode("," ,  $p['tags']['unused'])) ?></td>
+                <td><?= htmlspecialchars(implode(", " ,  $p['tags']['unused'])) ?></td>
         </tr>
 
         <? endforeach ?>
