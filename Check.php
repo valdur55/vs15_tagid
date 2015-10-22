@@ -31,6 +31,8 @@ class Check {
             //$this->get_blacklist();
             $this->set_tags();
             $this->set_needed_css();
+            //$this->get_caniuse();
+
             $from_menu = get_from_menu_css_tags();
             //ddump($this->tags["css_table"]);
             $css_not_listed= array_diff($this->tags["css_file"], $this->tags["css_table"], $from_menu->all);
@@ -44,12 +46,22 @@ class Check {
         $this->clean_unused_tags();
     }
 
+    function get_caniuse() {
+        $d = file_get_contents("lib/caniuse_data.json");
+        $d = json_decode($d);
+        $d = array_keys(get_object_vars($d->data));
+        $d = array_diff($d, $this->tags["html"], $this->tags["css"]);
+        var_dump($d); die();
+    }
+
+
     function get_tags_from_cache($file) {
         if (file_exists($file)) {
             $f = fopen($file, "r");
             $this->projects = unserialize(fgets($f));
         }
     }
+
 
     function save_projects($file){
         $f = fopen($file, "w");
@@ -310,6 +322,7 @@ class Check {
                 $this->popular_tags[]=$k;
             }
         }
+        $this->all_used=array_keys($rstat);
     }
 
     function clean_unused_tags(){
