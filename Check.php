@@ -24,6 +24,7 @@ class Check {
             "css" =>  "-name '*.css'",
             "black" => "",
             ];
+
         if (!FORCE_UPDATE) {
             $this->get_tags_from_cache("cache/projects");
         }
@@ -282,22 +283,28 @@ class Check {
         }
         $this->projects[$p_name]["tags"]["used"]=array_keys($data->html);
         $type = "css";
+        $files = array();
+        if (empty($project["files"]["css"])) {
+            //var_dump($project["user"]) ; die ();
+            $files=$project["files"]["html"];
+        } else {
+            $files =array_merge($project["files"]["css"], $project["files"]["html"]);
+        }
         foreach($this->tags[$type] as $tag){
-            if (empty($project["files"][$type] )){
+            if (empty($files )){
                 continue;
             }
-
-            foreach ($project["files"]["css"] as $file) {
-                if (shell_exec("grep -i -h -c -m 1 '$tag' '$file'") != 0){
+            foreach ($files as $file) {
+                if (shell_exec("grep -w -i -h -c -m 1 '$tag' '$file'") != 0){
                     $this->projects[$p_name]["tags"]["used"][]=$tag;
                     break;
                 }
             }
         }
         $black = array_intersect($this->tags["black"], $this->projects[$p_name]["tags"]["used"]);
-        //ddump($black); die();
         $this->projects[$p_name]["tags"]["used"] = array_diff($this->projects[$p_name]["tags"]["used"], $black);
         $this->projects[$p_name]["tags"]["black"] = $black;
+
     }
 
     function get_tags_usage($min_usage){
