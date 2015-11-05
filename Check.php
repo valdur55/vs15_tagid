@@ -174,7 +174,7 @@ class Check {
 
         foreach ($p as $project) {
             // Start output buffering (capturing)
-            //ob_start();
+            ob_start();
 
             //var_dump($project);
             $project_root = $this->cfg["p_root"];
