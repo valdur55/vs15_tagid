@@ -206,7 +206,6 @@ class Check {
             //die();
 
             if (!$deploy->need_update || FORCE_UPDATE) {
-                echo "UPD";
                 $changes = true;
                 $this->get_file_list($config->project_name);
                 $this->analyze_tags($config->project_name);
@@ -268,6 +267,7 @@ class Check {
                 $data->html[$tag->nodeName]=1;
 
                 //TODO: use $tag->getAttribute("style")
+                //TODO: hadnle "<style>"
                 foreach ($tag->attributes as $att) {
                     if ($att->nodeName === 'style') {
                         $style = $att->nodeValue;
@@ -278,9 +278,13 @@ class Check {
                 }
             }
         }
+        /*
         if (!empty($data->css)) {
             var_dump($data->css);
         }
+
+         */
+
         $this->projects[$p_name]["tags"]["used"]=array_keys($data->html);
         $type = "css";
         $files = array();
