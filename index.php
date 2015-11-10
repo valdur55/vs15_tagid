@@ -3,6 +3,7 @@
 $b=true;
 define ("DEV", !$b);
 define ("VERBOSE", !$b);
+define ("IMG_LOC", "./uploads/webimg");
 $min= (empty($_POST["min"])) ? 10 : $_POST["min"];
 define ("MIN_COUNT", $min);
 $drive_url= "https://docs.google.com/spreadsheets/d/".
@@ -52,6 +53,7 @@ $errors = array();
     <table id="projektid" border="1" >
         <thead>
         <?php $thead = array(
+            'pilt',
             'Nimi',
             'Blacklistiud tagid(arv)',
             'Kasutatud tagid (arv)',
@@ -66,6 +68,11 @@ $errors = array();
 
         <?php foreach ($projects as $p): ?>
             <tr>
+                <td>
+                    <?php for ($i = 0 ; $i < count($p["files"]["html"]); $i++) : ?>
+                        <img src="./lib/webimg/results/<?= $p['user'].'-'.$i.'.jpg' ?>" alt="Pilt">
+                    <?php endfor ?>
+                </td>
                 <td><a href="<?= $p["p_dir"] ?>"><?= $p["name"] ?></a></td>
                 <td><?= !empty($p['tags']["black"]) ? count($p["tags"]["black"]) : 0  ?></td>
                 <td><?= !empty($p['tags']["used"]) ? count($p["tags"]["used"]) : 0  ?></td>

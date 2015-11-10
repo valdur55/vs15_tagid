@@ -3,6 +3,9 @@
 
 define ("NAME", 0);
 include("lib/get_supported_css.php");
+include("lib/webimg/lib/GrabzItClient.class.php");
+include("lib/webimg/config.php");
+
 
 class Check {
     var $projects = array();
@@ -17,6 +20,8 @@ class Check {
     var $types = array("html" => [], "css" => []);
     var $stat = array();
     var $popular_tags = array();
+    private $all_used;
+    private $base_url;
 
     function Check($csv_link) {
         $this->types = [
@@ -24,7 +29,6 @@ class Check {
             "css" =>  "-name '*.css'",
             "black" => "",
             ];
-
         if (!FORCE_UPDATE) {
             $this->get_tags_from_cache("cache/projects");
         }
@@ -33,7 +37,7 @@ class Check {
             $this->set_tags();
             $this->set_needed_css();
             //$this->get_caniuse();
-
+            $this->set_base_url();
             $from_menu = get_from_menu_css_tags();
             //ddump($this->tags["css_table"]);
             $css_not_listed= array_diff($this->tags["css_file"], $this->tags["css_table"], $from_menu->all);
@@ -47,6 +51,13 @@ class Check {
         $this->clean_unused_tags();
     }
 
+    function set_base_url(){
+        $s = 'http://'.$_SERVER['HTTP_HOST'];
+        $url = explode("/", $_SERVER['REQUEST_URI']);
+        array_pop($url);
+        $s .= implode("/", $url).'/';
+        $this->base_url = $s;
+    }
     function get_caniuse() {
         $d = file_get_contents("lib/caniuse_data.json");
         $d = json_decode($d);
@@ -209,15 +220,43 @@ class Check {
                 $changes = true;
                 $this->get_file_list($config->project_name);
                 $this->analyze_tags($config->project_name);
+                $this->make_images($project["user"]);
             }
             //var_dump($deploy->last_commit);
             //$this->projects[$project["user"]]["last_commit"]=$deploy->last_commit;
+            ob_end_flush();
         }
 
         //Write changes to file
         if ($changes) {
             $this->save_projects("cache/projects");
         }
+    }
+
+    function make_images($user){
+        $files =$this->projects[$user]["files"]["html"];
+        if (!$files){
+            echo "pole html/PHP faile  <br>";
+            return;
+        }
+
+        $grabzItHandlerUrl = $this->base_url."lib/webimg/handler.php";
+        $i=0;
+        try
+        {
+            global $grabzItApplicationKey, $grabzItApplicationSecret;
+            foreach ($files as $file) {
+                $grabzIt = new GrabzItClient($grabzItApplicationKey, $grabzItApplicationSecret);
+                $grabzIt->SetImageOptions($this->base_url.$file,  $user."-".$i++, null, -1);
+                $grabzIt->Save($grabzItHandlerUrl);
+            }
+        }
+        catch (Exception $e)
+        {
+            die($e->getMessage());
+        }
+
+
     }
 
     function get_file_list($p_name){
@@ -287,7 +326,6 @@ class Check {
 
         $this->projects[$p_name]["tags"]["used"]=array_keys($data->html);
         $type = "css";
-        $files = array();
         if (empty($project["files"]["css"])) {
             //var_dump($project["user"]) ; die ();
             $files=$project["files"]["html"];
