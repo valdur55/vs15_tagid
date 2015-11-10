@@ -3,7 +3,6 @@
 $b=true;
 define ("DEV", !$b);
 define ("VERBOSE", !$b);
-define ("IMG_LOC", "./uploads/webimg");
 $min= (empty($_POST["min"])) ? 10 : $_POST["min"];
 define ("MIN_COUNT", $min);
 $drive_url= "https://docs.google.com/spreadsheets/d/".
