@@ -69,7 +69,7 @@ $errors = array();
             <tr>
                 <td>
                     <?php for ($i = 0 ; $i < count($p["files"]["html"]); $i++) : ?>
-                        <img src="./lib/webimg/results/<?= $p['user'].'-'.$i.'.jpg' ?>" alt="Pilt">
+                        <a href="<?= $p["files"]["html"][$i] ?>" ><img src="./lib/webimg/results/<?= $p['user'].'-'.$i.'.jpg' ?>" alt="Pilt"></a>
                     <?php endfor ?>
                 </td>
                 <td><a href="<?= $p["p_dir"] ?>"><?= $p["name"] ?></a></td>
