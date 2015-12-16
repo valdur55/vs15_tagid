@@ -247,7 +247,7 @@ class Check {
             global $grabzItApplicationKey, $grabzItApplicationSecret;
             foreach ($files as $file) {
                 $grabzIt = new GrabzItClient($grabzItApplicationKey, $grabzItApplicationSecret);
-                $grabzIt->SetImageOptions($this->base_url.$file,  $user."-".$i++, null, -1);
+                $grabzIt->SetImageOptions($this->base_url.$file,  $user."-".$i++, null, null);
                 $grabzIt->Save($grabzItHandlerUrl);
             }
         }
