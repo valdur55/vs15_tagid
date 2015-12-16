@@ -37,7 +37,7 @@ if (count($_POST) > 0)
 			}
 			else
 			{
-			    $grabzIt->SetImageOptions($url, null, null, -1);
+			    $grabzIt->SetImageOptions($url, null, null, null);
 			}
 			$grabzIt->Save($grabzItHandlerUrl);
 		}
